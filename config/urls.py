@@ -1,5 +1,5 @@
 """
-URL configuration for TMS project.
+URL config for project project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.1/topics/http/urls/
@@ -15,8 +15,15 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('common/', include('project.common.urls')),
+    path('users/', include('project.users.urls')),
+    path('tasks/', include('project.tasks.urls')),
+    path("", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
+    path("schema", SpectacularAPIView.as_view(), name="schema"),
+    path("redoc", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
 ]

@@ -1,15 +1,16 @@
-from django.utils.translation import gettext_lazy as _
-from django.views import View
 from rest_framework.permissions import SAFE_METHODS, BasePermission
-from rest_framework.request import Request
 
 
-class ReadOnly(BasePermission):
+class IsOwnerOrReadOnly(BasePermission):
     """
-    This is an example of a custom permission class. This permission only allows read-only access to a view.
+    Custom permission to only allow owners of an object to edit it.
     """
 
-    message = _("You do not have permission to perform this action.")
+    def has_object_permission(self, request, view, obj):
+        # Read permissions are allowed to any request,
+        # so we'll always allow GET, HEAD or OPTIONS requests.
+        if request.method in SAFE_METHODS:
+            return True
 
-    def has_permission(self, request: Request, view: View) -> bool:
-        return request.method in SAFE_METHODS
+        # Write permissions are only allowed to the owner of the snippet.
+        return obj.owner == request.user

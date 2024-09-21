@@ -23,7 +23,13 @@ urlpatterns = [
     path('common/', include('project.common.urls')),
     path('users/', include('project.users.urls')),
     path('tasks/', include('project.tasks.urls')),
-    path("", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
-    path("schema", SpectacularAPIView.as_view(), name="schema"),
-    path("redoc", SpectacularRedocView.as_view(url_name="schema"), name="redoc"),
+    path('', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('schema', SpectacularAPIView.as_view(), name='schema'),
+    path('redoc', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 ]
+
+urlpatterns += [
+    path('login/', include('rest_framework.urls')),
+]
+
+# https://www.django-rest-framework.org/tutorial/4-authentication-and-permissions/

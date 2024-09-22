@@ -1,15 +1,17 @@
 from django.contrib.auth.models import User
+from django.shortcuts import redirect
 from rest_framework.generics import GenericAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework_simplejwt.views import TokenObtainPairView
 
-from project.users.serializers import UserSerializer
+from project.users.serializers import UserSerializer, UserListSerializer
 
 
 class UserList(ListAPIView):
     queryset = User.objects.all()
-    serializer_class = UserSerializer
+    serializer_class = UserListSerializer
 
 
 class UserDetail(RetrieveAPIView):
@@ -34,8 +36,8 @@ class RegisterUserView(GenericAPIView):
         # Create user
         user = User.objects.create(
             **validated_data,
-            is_superuser=True,
-            is_staff=True,
+            is_superuser=False,
+            is_staff=False,
         )
 
         # Set password

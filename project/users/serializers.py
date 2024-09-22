@@ -13,5 +13,18 @@ class UserSerializer(serializers.ModelSerializer):
             "last_name",
             "email",
             "password",
+        )
+
+class UserListSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = (
+            "username",
+            "first_name",
+            "last_name",
+            "email",
+            "password",
             "tasks",
         )

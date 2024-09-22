@@ -29,7 +29,7 @@ urlpatterns = [
 ]
 
 urlpatterns += [
-    path('login/', include('rest_framework.urls')),
+    path('api-auth/', include('rest_framework.urls')),
 ]
 
 # https://www.django-rest-framework.org/tutorial/4-authentication-and-permissions/

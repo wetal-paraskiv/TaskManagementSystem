@@ -15,16 +15,27 @@ class UserSerializer(serializers.ModelSerializer):
             "password",
         )
 
+
+class LoginSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = (
+            "email",
+            "password",
+        )
+
+
 class UserListSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True)
+    full_name = serializers.CharField(source='get_full_name')
+    fullname = serializers.SerializerMethodField()
 
     class Meta:
         model = User
         fields = (
-            "username",
-            "first_name",
-            "last_name",
-            "email",
-            "password",
-            "tasks",
+            "id",
+            "full_name",
+            "fullname",
         )
+
+    def get_fullname(self, obj):
+        return f'{obj.first_name} {obj.last_name}'

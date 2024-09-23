@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+import datetime
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -87,6 +87,18 @@ REST_FRAMEWORK = {
     "DEFAULT_RENDERER_CLASSES": ("rest_framework.renderers.JSONRenderer",),
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
+
+# JWT_AUTH = {
+#     # how long the original token is valid for
+#     'JWT_EXPIRATION_DELTA': datetime.timedelta(days=2),
+#
+#     # allow refreshing of tokens
+#     'JWT_ALLOW_REFRESH': True,
+#
+#     # this is the maximum time AFTER the token was issued that
+#     # it can be refreshed.  exprired tokens can't be refreshed.
+#     'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=7),
+# }
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases

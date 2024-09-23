@@ -1,12 +1,16 @@
 from django.contrib.auth.models import User
-from django.shortcuts import redirect
 from rest_framework.generics import GenericAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework_simplejwt.views import TokenObtainPairView
 
-from project.users.serializers import UserSerializer, UserListSerializer
+from project.users.serializers import UserSerializer, UserListSerializer, LoginSerializer
+
+from django.http import JsonResponse
+from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
+from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
 
 
 class UserList(ListAPIView):
@@ -45,3 +49,25 @@ class RegisterUserView(GenericAPIView):
         user.save()
 
         return Response(self.serializer_class(user).data)
+
+
+class LoginView(GenericAPIView):
+    serializer_class = LoginSerializer
+    permission_classes = (AllowAny,)
+    authentication_classes = ()
+
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
+
+        user = authenticate(
+            username=username, password=password)
+
+        refresh = RefreshToken.for_user(user)
+
+        return JsonResponse(
+            {
+                'refresh': str(refresh),
+                'access': str(refresh.access_token)
+            }
+        )

@@ -8,4 +8,16 @@ class TaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Task
-        fields = ["owner", "title", "description", "status"]
+        fields = ["id", "owner", "title", "description", "status"]
+
+    def get_id(self, obj):
+        return obj.id
+
+
+class TaskListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Task
+        fields = (
+            "id",
+            "title",
+        )

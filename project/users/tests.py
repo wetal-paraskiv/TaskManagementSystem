@@ -1,25 +1,42 @@
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.test import TestCase
-from rest_framework.reverse import reverse
-from rest_framework.test import APIClient
 
 
-class TestUsers(TestCase):
-    fixtures = ["users"]
+class UsersManagersTests(TestCase):
 
-    def setUp(self) -> None:
-        self.client = APIClient()
-        # check data in fixture json file
-        self.test_user1 = User.objects.get(email="user1@email.com")
+    def test_create_user(self):
+        User = get_user_model()
+        user = User.objects.create_user(email="normal@user.com", password="foo")
+        self.assertEqual(user.email, "normal@user.com")
+        self.assertTrue(user.is_active)
+        self.assertFalse(user.is_staff)
+        self.assertFalse(user.is_superuser)
+        try:
+            # username is None for the AbstractUser option
+            # username does not exist for the AbstractBaseUser option
+            self.assertIsNone(user.username)
+        except AttributeError:
+            pass
+        with self.assertRaises(TypeError):
+            User.objects.create_user()
+        with self.assertRaises(TypeError):
+            User.objects.create_user(email="")
+        with self.assertRaises(ValueError):
+            User.objects.create_user(email="", password="foo")
 
-    def test_register(self) -> None:
-        response = self.client.post(
-            reverse("token_register"),
-            {
-                "first_name": "firstname2",
-                "last_name": "lastname2",
-                "username": "username2",
-                "password": "testpwd2",
-            },
-        )
-        self.assertEqual(response.status_code, 200)
+    def test_create_superuser(self):
+        User = get_user_model()
+        admin_user = User.objects.create_superuser(email="super@user.com", password="foo")
+        self.assertEqual(admin_user.email, "super@user.com")
+        self.assertTrue(admin_user.is_active)
+        self.assertTrue(admin_user.is_staff)
+        self.assertTrue(admin_user.is_superuser)
+        try:
+            # username is None for the AbstractUser option
+            # username does not exist for the AbstractBaseUser option
+            self.assertIsNone(admin_user.username)
+        except AttributeError:
+            pass
+        with self.assertRaises(ValueError):
+            User.objects.create_superuser(
+                email="super@user.com", password="foo", is_superuser=False)

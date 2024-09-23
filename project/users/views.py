@@ -4,6 +4,7 @@ from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
 from rest_framework.response import Response
 
+from project.users.models import CustomUser
 from project.users.serializers import UserSerializer, UserListSerializer, LoginSerializer
 
 from django.http import JsonResponse
@@ -14,12 +15,12 @@ from django.contrib.auth import authenticate
 
 
 class UserList(ListAPIView):
-    queryset = User.objects.all()
+    queryset = CustomUser.objects.all()
     serializer_class = UserListSerializer
 
 
 class UserDetail(RetrieveAPIView):
-    queryset = User.objects.all()
+    queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
 
 
@@ -38,7 +39,7 @@ class RegisterUserView(GenericAPIView):
         password = validated_data.pop("password")
 
         # Create user
-        user = User.objects.create(
+        user = CustomUser.objects.create(
             **validated_data,
             is_superuser=False,
             is_staff=False,
@@ -57,11 +58,11 @@ class LoginView(GenericAPIView):
     authentication_classes = ()
 
     def post(self, request):
-        username = request.data.get('username')
+        email = request.data.get('email')
         password = request.data.get('password')
 
         user = authenticate(
-            username=username, password=password)
+            email=email, password=password)
 
         refresh = RefreshToken.for_user(user)
 

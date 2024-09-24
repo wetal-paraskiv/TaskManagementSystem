@@ -1,11 +1,12 @@
+from django.http import JsonResponse
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
-from rest_framework.generics import GenericAPIView
+from rest_framework.generics import GenericAPIView, RetrieveAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 
 from project.common.permissions import IsOwnerOrReadOnly
 from project.tasks.models import Task
-from project.tasks.serializers import TaskSerializer, TaskListSerializer
+from project.tasks.serializers import TaskSerializer, TaskListSerializer, MyTaskListSerializer
 
 
 class TaskListView(GenericAPIView):
@@ -13,21 +14,51 @@ class TaskListView(GenericAPIView):
     permission_classes = (IsAuthenticatedOrReadOnly,
                           IsOwnerOrReadOnly)
 
-    # permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-
-    def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+    def perform_create(self, serializer_class):
+        serializer_class.save(owner=self.request.user)
 
     def get(self, request: Request) -> Response:
         tasks = Task.objects.all()
         return Response(self.get_serializer(tasks, many=True).data)
 
 
+class MyTaskListView(GenericAPIView):
+    serializer_class = MyTaskListSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,
+                          IsOwnerOrReadOnly)
+
+    def get(self, request: Request) -> Response:
+        owner = request.user.id
+        if owner:
+            tasks = Task.objects.all().filter(owner=request.user.id)
+            response = Response(self.get_serializer(tasks, many=True).data)
+        else:
+            response = JsonResponse({'Response: ': 'You must LOGIN to access your tasks!'})
+        return response
+
+
+class CompletedTaskListView(GenericAPIView):
+    serializer_class = MyTaskListSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly,
+                          IsOwnerOrReadOnly)
+
+    def get(self, request: Request) -> Response:
+        owner = request.user.id
+        if owner:
+            tasks = Task.objects.all().filter(owner=request.user.id, status=False)
+            response = Response(self.get_serializer(tasks, many=True).data)
+        else:
+            response = JsonResponse({'Response: ': 'You must LOGIN to access your tasks!'})
+        return response
+
+
 class TaskAddView(GenericAPIView):
     serializer_class = TaskSerializer
-    permission_classes = (IsAuthenticatedOrReadOnly,)
+    permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly,)
+    authentication_classes = ()
 
-    # authentication_classes = ()
+    # def perform_create(self, serializer_class):
+    #     serializer_class.save(owner=self.request.user)
 
     def post(self, request: Request) -> Response:
         #  Validate data
@@ -39,3 +70,11 @@ class TaskAddView(GenericAPIView):
         task = Task.objects.create(**validated_data, owner=owner)
 
         return Response(self.serializer_class(task).get_id(task))
+
+
+class TaskDetailView(RetrieveAPIView):
+    permission_classes = (IsAuthenticatedOrReadOnly,
+                          IsOwnerOrReadOnly)
+
+    queryset = Task.objects.all()
+    serializer_class = TaskSerializer

@@ -3,6 +3,7 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
 from rest_framework.generics import GenericAPIView, RetrieveAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
+from urllib3 import request
 
 from project.common.permissions import IsOwnerOrReadOnly
 from project.tasks.models import Task
@@ -55,10 +56,7 @@ class CompletedTaskListView(GenericAPIView):
 class TaskAddView(GenericAPIView):
     serializer_class = TaskSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly,)
-    authentication_classes = ()
-
-    # def perform_create(self, serializer_class):
-    #     serializer_class.save(owner=self.request.user)
+    # authentication_classes = ()
 
     def post(self, request: Request) -> Response:
         #  Validate data
@@ -76,5 +74,9 @@ class TaskDetailView(RetrieveAPIView):
     permission_classes = (IsAuthenticatedOrReadOnly,
                           IsOwnerOrReadOnly)
 
-    queryset = Task.objects.all()
     serializer_class = TaskSerializer
+    queryset = Task.objects.all()
+
+    def get_queryset(self):
+        user = self.request.user
+        return user.tasks.all()

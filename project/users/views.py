@@ -63,12 +63,13 @@ class LoginView(GenericAPIView):
 
         user = authenticate(
             email=email, password=password)
-
-        refresh = RefreshToken.for_user(user)
-
-        return JsonResponse(
-            {
-                'refresh': str(refresh),
-                'access': str(refresh.access_token)
-            }
-        )
+        if user:
+            refresh = RefreshToken.for_user(user)
+            response = JsonResponse(
+                {
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token)
+                })
+        else:
+            response = JsonResponse({'response': 'Unknown user, please register the account!'})
+        return response

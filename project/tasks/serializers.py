@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from project.tasks.models import Task
+from project.tasks.models import Task, Comment
 
 
 class TaskSerializer(serializers.ModelSerializer):
@@ -10,7 +10,8 @@ class TaskSerializer(serializers.ModelSerializer):
         model = Task
         fields = ["id", "owner", "title", "description", "status"]
 
-    def get_id(self, obj):
+    @staticmethod
+    def get_id(obj):
         return obj.id
 
 
@@ -33,3 +34,15 @@ class MyTaskListSerializer(serializers.ModelSerializer):
             "id",
             "title",
         )
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.ReadOnlyField(source='task.owner.username')
+
+    class Meta:
+        model = Comment
+        fields = ["author", "task_id", "body_text"]
+
+    @staticmethod
+    def get_id(obj):
+        return obj.id

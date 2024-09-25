@@ -10,10 +10,6 @@ class TaskSerializer(serializers.ModelSerializer):
         model = Task
         fields = ["id", "owner", "title", "description", "status"]
 
-    @staticmethod
-    def get_id(obj):
-        return obj.id
-
 
 class TaskListSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source='owner.username')
@@ -37,12 +33,18 @@ class MyTaskListSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    author = serializers.ReadOnlyField(source='task.owner.username')
+    author = serializers.ReadOnlyField(source='request.user.username')
 
     class Meta:
         model = Comment
-        fields = ["author", "task_id", "body_text"]
+        fields = ["author", "task", "body_text"]
 
-    @staticmethod
-    def get_id(obj):
-        return obj.id
+
+class TaskCommentsSerializer(serializers.ModelSerializer):
+
+    def task(self, obj):
+        return obj.task
+
+    class Meta:
+        model = Comment
+        fields = ["task", "author", "body_text"]

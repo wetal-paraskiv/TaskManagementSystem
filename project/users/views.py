@@ -1,4 +1,3 @@
-from django.contrib.auth.models import User
 from rest_framework.generics import GenericAPIView, ListAPIView, RetrieveAPIView
 from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
@@ -8,9 +7,7 @@ from project.users.models import CustomUser
 from project.users.serializers import UserSerializer, UserListSerializer, LoginSerializer
 
 from django.http import JsonResponse
-from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 
 

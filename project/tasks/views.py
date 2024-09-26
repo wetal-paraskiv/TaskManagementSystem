@@ -1,6 +1,5 @@
-from django.http import JsonResponse
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
-from rest_framework.generics import GenericAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView, CreateAPIView
+from rest_framework.generics import GenericAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 
@@ -36,7 +35,7 @@ class MyTaskListView(GenericAPIView):
             tasks = user.tasks.all().filter(status=True)
             response = Response(self.get_serializer(tasks, many=True).data)
         else:
-            response = JsonResponse({'Response: ': 'You must LOGIN to access your tasks!'})
+            response = Response('You must LOGIN to access your tasks!')
         return response
 
 
@@ -50,7 +49,7 @@ class CompletedTaskListView(GenericAPIView):
             tasks = user.tasks.all().filter(status=False)
             response = Response(self.get_serializer(tasks, many=True).data)
         else:
-            response = JsonResponse({'Response: ': 'You must LOGIN to access your tasks!'})
+            response = Response('You must LOGIN to access your tasks!')
         return response
 
 
@@ -130,7 +129,6 @@ class CommentAddView(GenericAPIView):
 
         task = validated_data.pop('task')
         comment = Comment.objects.create(**validated_data, task=task)
-
         return Response(self.get_id(comment))
 
 
@@ -138,10 +136,11 @@ class TaskCommentsView(RetrieveAPIView):
     permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
     serializer_class = TaskCommentsSerializer
 
-    def get(self, request: Request, pk) -> Response:
+    def get(self, request, *args, **kwargs) -> Response:
+        pk = kwargs['pk']
         comments = Comment.objects.all().filter(task=pk)
         if comments:
             response = Response(self.get_serializer(comments, many=True).data)
         else:
-            response = JsonResponse({'Response: ': 'No Task with provided id found!'})
+            response = Response('No Task with provided id found!')
         return response

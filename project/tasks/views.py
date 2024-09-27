@@ -160,12 +160,12 @@ class CommentAddView(GenericAPIView):
         validated_data = serializer.validated_data
 
         task = validated_data.pop('task')
-        comment = Comment.objects.create(**validated_data, task=task)
+        author = request.user
+        if author.is_authenticated:
+            comment = Comment.objects.create(**validated_data, task=task, author=author)
+        else:
+            comment = Comment.objects.create(**validated_data, task=task)
         return Response(self.get_id(comment))
-
-    # extend the view with field author for serializer
-    def perform_create(self, serializer_class):
-        serializer_class.save(author=self.request.user.username)
 
 
 class TaskCommentsView(RetrieveAPIView):
@@ -178,5 +178,5 @@ class TaskCommentsView(RetrieveAPIView):
         if comments:
             response = Response(self.get_serializer(comments, many=True).data)
         else:
-            response = Response('No Task with provided id found!')
+            response = Response('No Comment for provided Task id found!')
         return response

@@ -35,15 +35,12 @@ class MyTaskListSerializer(serializers.ModelSerializer):
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = ["author", "task", "body_text"]
-        read_only_fields = ('author',)
+        fields = ["task", "body_text"]
 
 
 class TaskCommentsSerializer(serializers.ModelSerializer):
-
-    def task(self, obj):
-        return obj.task
+    comment_author = serializers.ReadOnlyField(source='get_author')
 
     class Meta:
         model = Comment
-        fields = ["task", "author", "body_text"]
+        fields = ["task", "comment_author", "body_text"]

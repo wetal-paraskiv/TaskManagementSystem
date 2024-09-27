@@ -1,7 +1,9 @@
+from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
 from rest_framework.generics import GenericAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework import filters
 
 from project.common.permissions import IsOwnerOrReadOnly
 from project.tasks.models import Task, Comment
@@ -11,6 +13,7 @@ from project.tasks.serializers import (
     MyTaskListSerializer,
     CommentSerializer,
     TaskCommentsSerializer)
+from project.users.models import CustomUser
 
 
 class TaskListView(GenericAPIView):
@@ -53,6 +56,13 @@ class CompletedTaskListView(GenericAPIView):
         return response
 
 
+class SearchTaskByTitleView(GenericAPIView):
+    queryset = Task.objects.all()
+    serializer_class = TaskSerializer
+    filter_backends = [filters.SearchFilter]
+    search_fields = ['title']
+
+
 class TaskAddView(GenericAPIView):
     serializer_class = TaskSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly,)
@@ -86,6 +96,7 @@ class TaskDetailView(RetrieveAPIView):
 
 class TaskStatusUpdateView(UpdateAPIView):
     permission_classes = (IsOwnerOrReadOnly,)
+    serializer_class = TaskSerializer
     queryset = Task.objects.all()
 
     def patch(self, request, *args, **kwargs):
@@ -99,6 +110,27 @@ class TaskStatusUpdateView(UpdateAPIView):
             return Response(data="Wrong parameters")
         else:
             return Response("Get your dirty hands OFF! This is not your task!")
+
+
+class UpdateTaskOwnerView(UpdateAPIView):
+    permission_classes = (AllowAny,)
+    serializer_class = TaskSerializer  # ???
+    queryset = Task.objects.all()
+
+    def patch(self, request, *args, **kwargs):
+        task = self.get_object()
+        user_id = kwargs['user_id']
+        try:
+            user = CustomUser.objects.get(id=user_id)
+            task.owner = user
+            serializer = TaskSerializer(task, data=request.data, partial=True)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(f"Task status update completed! id: {task.id}")
+            else:
+                return Response(data="Wrong parameters")
+        except ObjectDoesNotExist:
+            return Response(data="Provided object doesn't exists!")
 
 
 class TaskDeleteView(DestroyAPIView):
@@ -130,6 +162,10 @@ class CommentAddView(GenericAPIView):
         task = validated_data.pop('task')
         comment = Comment.objects.create(**validated_data, task=task)
         return Response(self.get_id(comment))
+
+    # extend the view with field author for serializer
+    def perform_create(self, serializer_class):
+        serializer_class.save(author=self.request.user.username)
 
 
 class TaskCommentsView(RetrieveAPIView):

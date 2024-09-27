@@ -10,7 +10,9 @@ from project.tasks.views import (
     TaskStatusUpdateView,
     TaskDeleteView,
     CommentAddView,
-    TaskCommentsView)
+    TaskCommentsView,
+    UpdateTaskOwnerView,
+    SearchTaskByTitleView, )
 
 router = DefaultRouter(trailing_slash=False)
 
@@ -22,6 +24,8 @@ urlpatterns = [
     path("add", TaskAddView.as_view(), name="tasks_add"),
     path("update_status/<int:pk>", TaskStatusUpdateView.as_view(), name="task_status_update"),
     path("delete/<int:pk>", TaskDeleteView.as_view(), name="delete_task"),
+    path("update_task_owner/<int:pk>/<int:user_id>", UpdateTaskOwnerView.as_view(), name="update_task_owner"),
+    path("search_task_by_title/<str:search>", SearchTaskByTitleView.as_view(), name="search_task_by_title"),
     path("comment", CommentAddView.as_view(), name="add_comment"),
     path("comments/<int:pk>", TaskCommentsView.as_view(), name="task_comments"),
     *router.urls,

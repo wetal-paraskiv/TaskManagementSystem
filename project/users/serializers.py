@@ -29,14 +29,14 @@ class LoginSerializer(serializers.ModelSerializer):
 
 class UserListSerializer(serializers.ModelSerializer):
     full_name = serializers.CharField(source='get_full_name')
-    fullname = serializers.SerializerMethodField()
+    # fullname = serializers.SerializerMethodField()
 
     class Meta:
         model = CustomUser
         fields = (
             "id",
             "full_name",
-            "fullname",
+            # "fullname",
         )
 
     def get_fullname(self, obj):

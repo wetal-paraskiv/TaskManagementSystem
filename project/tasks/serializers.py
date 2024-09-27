@@ -33,11 +33,10 @@ class MyTaskListSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializer(serializers.ModelSerializer):
-    author = serializers.ReadOnlyField(source='request.user.username')
-
     class Meta:
         model = Comment
         fields = ["author", "task", "body_text"]
+        read_only_fields = ('author',)
 
 
 class TaskCommentsSerializer(serializers.ModelSerializer):

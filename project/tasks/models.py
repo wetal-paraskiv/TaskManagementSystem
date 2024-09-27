@@ -15,7 +15,10 @@ class Task(models.Model):
 
 class Comment(models.Model):
     task = models.ForeignKey('tasks.Task', related_name='comments', on_delete=models.CASCADE)
-    author = models.CharField(max_length=125, db_index=True, default='Anonymous')
+    # author = models.CharField(max_length=25, db_index=True)
+    author = models.ForeignKey('users.CustomUser',
+                              related_name='comments',
+                              on_delete=models.CASCADE)
     body_text = models.CharField(max_length=125, db_index=True)
 
     def __str__(self):

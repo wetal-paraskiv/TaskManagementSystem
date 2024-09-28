@@ -185,3 +185,12 @@ SPECTACULAR_SETTINGS = {
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": True,
 }
+
+# Email Config
+EMAIL_HOST = '<smtp.gmail.com>' # Simple Mail Transfer Protocol
+EMAIL_HOST_USER = 'your@djangoapp.com'
+EMAIL_HOST_PASSWORD = 'your password'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_TIMEOUT = 300  # in seconds
+DEFAULT_FROM_EMAIL = 'sender name <your@djangoapp.com>'

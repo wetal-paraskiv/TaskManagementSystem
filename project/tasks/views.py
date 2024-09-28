@@ -1,6 +1,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, AllowAny
-from rest_framework.generics import GenericAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView
+from rest_framework.generics import GenericAPIView, RetrieveAPIView, UpdateAPIView, DestroyAPIView, ListAPIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework import filters
@@ -56,11 +56,13 @@ class CompletedTaskListView(GenericAPIView):
         return response
 
 
-class SearchTaskByTitleView(GenericAPIView):
-    queryset = Task.objects.all()
+class SearchTaskByTitleView(ListAPIView):
     serializer_class = TaskSerializer
+    permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
+    queryset = Task.objects.all()
     filter_backends = [filters.SearchFilter]
     search_fields = ['title']
+    ordering_fields = ['title']
 
 
 class TaskAddView(GenericAPIView):
